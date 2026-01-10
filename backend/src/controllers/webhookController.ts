@@ -23,9 +23,10 @@ export const handleGmailWebhook = async (req: Request, res: Response) => {
         console.log(`🔔 Notification for: ${emailAddress}, New HistoryId: ${historyId}`);
 
         // 3. Find User
-        const user = await User.findOne({ email: emailAddress }).select('+tokens');
-        if (!user || !user.tokens) {
-            console.error("User not found or no tokens");
+        const user = await User.findOne({ email: emailAddress }).select('+tokens.iv +tokens.encryptedData');
+
+        if (!user || !user.tokens || !user.tokens.iv || !user.tokens.encryptedData) {
+            console.error("User found but tokens are missing or incomplete. Re-auth required.");
             return;
         }
 
