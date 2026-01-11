@@ -7,6 +7,8 @@ import dotenv from 'dotenv';
 import cookieSession from 'cookie-session';
 import { googleLogin, googleCallback } from './controllers/authController.js';
 import { handleGmailWebhook } from './controllers/webhookController.js';
+import { getJobs } from './controllers/jobController.js';
+import { requireAuth } from './middleware/requireAuth.js';
 
 dotenv.config();
 
@@ -46,7 +48,7 @@ app.use(cors({
 // Socket.io Setup
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins, 
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true
   }
@@ -54,7 +56,7 @@ const io = new Server(server, {
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
-  
+
   // Join a room based on userId for private updates
   socket.on('join-room', (userId) => {
     socket.join(userId);
@@ -74,6 +76,7 @@ mongoose.connect(process.env.MONGO_URI as string)
 app.get('/auth/google', googleLogin);
 app.get('/auth/google/callback', googleCallback);
 app.post('/webhook/gmail', handleGmailWebhook);
+app.get('/jobs', requireAuth, getJobs);
 
 // Test Route
 app.get('/', (req, res) => {
