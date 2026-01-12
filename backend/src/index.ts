@@ -22,9 +22,9 @@ app.use(
   cookieSession({
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     keys: [process.env.SESSION_SECRET as string], // Use your SESSION_SECRET from .env
-    secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+    secure: true, // Always use secure cookies (required for cross-origin with sameSite: 'none')
     httpOnly: true, // Prevent client-side JS from accessing cookie
-    sameSite: 'lax' // CSRF protection, 'none' if frontend is different domain
+    sameSite: 'none' // Required for cross-origin requests (localhost frontend to production backend)
   })
 );
 
