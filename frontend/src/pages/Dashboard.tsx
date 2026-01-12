@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import api from '@/lib/api';
 
 interface Job {
@@ -27,17 +26,10 @@ export default function Dashboard() {
                     else if (status.includes('interview')) newStats.interviewing++;
                     else if (status.includes('offer')) newStats.offers++;
                     else if (status.includes('reject')) newStats.rejections++;
-
-                    // Fallback for case sensitivity or slight mismatches
-                    // In real app, rely on enum constants
                 });
 
-                // Set Stats
                 setStats(newStats);
-
-                // Set Recent Activity (assuming backend sorts by date, or take top 5)
                 setRecentActivity(data.slice(0, 5));
-
             } catch (error) {
                 console.error('Failed to load dashboard data:', error);
             } finally {
@@ -49,81 +41,86 @@ export default function Dashboard() {
     }, []);
 
     if (loading) {
-        return <div className="p-8">Loading dashboard...</div>;
+        return (
+            <div className="flex items-center justify-center h-64">
+                <p className="text-gray-600">Loading dashboard...</p>
+            </div>
+        );
     }
 
-    return (
-        <div className="space-y-6">
-            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+    const statCards = [
+        { label: 'Applied', value: stats.applied },
+        { label: 'Interviewing', value: stats.interviewing },
+        { label: 'Offers', value: stats.offers },
+        { label: 'Rejections', value: stats.rejections },
+    ];
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Applied</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{stats.applied}</div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Interviewing</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{stats.interviewing}</div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Offers</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{stats.offers}</div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Rejections</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{stats.rejections}</div>
-                    </CardContent>
-                </Card>
+    return (
+        <div className="space-y-8">
+            {/* Header */}
+            <div>
+                <h1 className="text-4xl font-bold text-black mb-2">Dashboard</h1>
+                <p className="text-gray-600">Overview of your job applications</p>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="col-span-4">
-                    <CardHeader>
-                        <CardTitle>Overview</CardTitle>
-                    </CardHeader>
-                    <CardContent className="pl-2">
-                        <div className="h-[200px] flex items-center justify-center text-muted-foreground border border-dashed rounded-md">
-                            Activity Chart (Coming Soon)
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {statCards.map((stat) => (
+                    <div
+                        key={stat.label}
+                        className="bg-white border-2 border-black rounded-lg p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                    >
+                        <div className="flex items-center justify-between mb-2">
+                            <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">
+                                {stat.label}
+                            </p>
                         </div>
-                    </CardContent>
-                </Card>
-                <Card className="col-span-3">
-                    <CardHeader>
-                        <CardTitle>Recent Activity</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-4">
-                            {recentActivity.length === 0 ? (
-                                <div className="text-sm text-muted-foreground">No recent activity</div>
-                            ) : (
-                                recentActivity.map(job => (
-                                    <div key={job._id} className="flex items-center justify-between border-b pb-2 last:border-0">
-                                        <div>
-                                            <p className="text-sm font-medium">{job.companyName}</p>
-                                            <p className="text-xs text-muted-foreground">Updated {new Date(job.lastUpdated).toLocaleDateString()}</p>
-                                        </div>
-                                        <div className="text-xs px-2 py-1 rounded bg-secondary">{job.status}</div>
+                        <p className="text-4xl font-bold text-black">{stat.value}</p>
+                    </div>
+                ))}
+            </div>
+
+            {/* Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Overview Chart */}
+                <div className="lg:col-span-2 bg-white border-2 border-black rounded-lg p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <h2 className="text-xl font-bold text-black mb-4">Overview</h2>
+                    <div className="h-64 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg">
+                        <p className="text-sm text-gray-500">Activity Chart (Coming Soon)</p>
+                    </div>
+                </div>
+
+                {/* Recent Activity */}
+                <div className="bg-white border-2 border-black rounded-lg p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <h2 className="text-xl font-bold text-black mb-4">Recent Activity</h2>
+                    <div className="space-y-3">
+                        {recentActivity.length === 0 ? (
+                            <p className="text-sm text-gray-500 text-center py-8">No recent activity</p>
+                        ) : (
+                            recentActivity.map((job) => (
+                                <div
+                                    key={job._id}
+                                    className="flex items-center justify-between py-3 border-b border-gray-200 last:border-0"
+                                >
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-semibold text-black truncate">
+                                            {job.companyName}
+                                        </p>
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            {new Date(job.lastUpdated).toLocaleDateString('en-US', {
+                                                month: 'short',
+                                                day: 'numeric',
+                                            })}
+                                        </p>
                                     </div>
-                                ))
-                            )}
-                        </div>
-                    </CardContent>
-                </Card>
+                                    <span className="ml-3 px-2.5 py-1 text-xs font-medium bg-black text-white rounded uppercase">
+                                        {job.status}
+                                    </span>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
             </div>
         </div>
     );

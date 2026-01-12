@@ -105,9 +105,32 @@ export const googleCallback = async (req: Request, res: Response) => {
       }
     }
 
-    (req.session as any).userId = user._id;
+    // Set session - ensure it's a string
+    (req.session as any).userId = user._id.toString();
+    
+    // Debug logging BEFORE redirect
+    console.log('OAuth callback - Session set:', {
+        userId: user._id,
+        userIdType: typeof user._id,
+        sessionUserId: (req.session as any).userId,
+        sessionUserIdType: typeof (req.session as any).userId,
+        email: user.email,
+        sessionKeys: Object.keys(req.session || {}),
+        cookies: req.headers.cookie
+    });
+    
     // Redirect to Frontend
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    console.log('Redirecting to:', `${frontendUrl}/dashboard?uid=${user._id}`);
+    
+    // Log response headers to see if cookie is being set
+    res.on('finish', () => {
+        console.log('OAuth callback - Response sent. Headers:', {
+            'set-cookie': res.getHeader('set-cookie'),
+            statusCode: res.statusCode
+        });
+    });
+    
     res.redirect(`${frontendUrl}/dashboard?uid=${user._id}`);
 
   } catch (error) {

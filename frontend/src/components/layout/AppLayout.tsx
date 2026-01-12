@@ -9,27 +9,31 @@ export default function AppLayout() {
 
     if (isLoading) {
         return (
-            <div className="h-screen w-full flex items-center justify-center bg-background">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <div className="h-screen w-full flex items-center justify-center bg-white">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="h-8 w-8 animate-spin text-black" />
+                    <p className="text-sm text-gray-600">Loading...</p>
+                </div>
             </div>
         );
     }
 
-    // Allow access if socket/cookie is present or generic "user" is set from URL
     if (!user) {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
     return (
-        <div className="flex min-h-screen bg-background font-sans antialiased">
+        <div className="flex min-h-screen bg-white">
             {/* Sidebar - Desktop */}
-            <aside className="hidden w-64 md:block fixed inset-y-0 z-50">
+            <aside className="hidden w-64 md:block fixed inset-y-0 z-50 border-r border-black bg-white">
                 <Sidebar className="h-full" />
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 md:ml-64 p-8 overflow-y-auto h-screen bg-background">
-                <Outlet />
+            <main className="flex-1 md:ml-64 bg-white min-h-screen">
+                <div className="p-8 max-w-7xl mx-auto">
+                    <Outlet />
+                </div>
             </main>
         </div>
     );
