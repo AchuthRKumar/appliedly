@@ -10,10 +10,13 @@ const JobSchema = new mongoose.Schema({
         enum: ['Applied', 'Interviewing', 'Rejection', 'Offer', 'Unknown'],
         default: 'Applied'
     },
+    location: { type: String },
+    email: { type: String },
+    notes: { type: String },
     nextSteps: { type: String },
     dateApplied: { type: Date, default: Date.now },
     lastUpdated: { type: Date, default: Date.now },
-    rawEmailThreadId: { type: String, unique: true }, // Prevent duplicate processing
+    rawEmailThreadId: { type: String, unique: true, sparse: true }, // Prevent duplicate processing
     rawEmailSubject: { type: String }
 });
 

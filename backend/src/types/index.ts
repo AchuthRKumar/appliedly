@@ -24,6 +24,9 @@ export interface IJob extends Document {
     companyName: string;
     jobTitle: string;
     status: 'Applied' | 'Interviewing' | 'Rejection' | 'Offer' | 'Unknown';
+    location?: string;
+    email?: string;
+    notes?: string;
     nextSteps?: string;
     dateApplied: Date;
     lastUpdated: Date;

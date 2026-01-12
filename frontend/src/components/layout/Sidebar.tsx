@@ -41,7 +41,7 @@ export function Sidebar({ className }: SidebarProps) {
                             <line x1="12" y1="22.08" x2="12" y2="12"></line>
                         </svg>
                     </div>
-                    <h2 className="text-xl font-bold text-black tracking-tight">Job Tracker</h2>
+                    <h2 className="text-xl font-bold text-black tracking-tight">Appliedly</h2>
                 </div>
             </div>
 

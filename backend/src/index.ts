@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
 import cookieSession from 'cookie-session';
 import { googleLogin, googleCallback, getUserProfile } from './controllers/authController.js';
 import { handleGmailWebhook } from './controllers/webhookController.js';
-import { getJobs } from './controllers/jobController.js';
+import { getJobs, createJob, updateJob, deleteJob, getJob } from './controllers/jobController.js';
 import { requireAuth } from './middleware/requireAuth.js';
 
 dotenv.config();
@@ -119,9 +119,15 @@ mongoose.connect(process.env.MONGO_URI as string)
 
 app.get('/auth/google', googleLogin);
 app.get('/auth/google/callback', googleCallback);
-app.get('/auth/me', requireAuth, getUserProfile); // New profile endpoint
+app.get('/auth/me', requireAuth, getUserProfile);
 app.post('/webhook/gmail', handleGmailWebhook);
+
+// Job routes
 app.get('/jobs', requireAuth, getJobs);
+app.post('/jobs', requireAuth, createJob);
+app.get('/jobs/:id', requireAuth, getJob);
+app.put('/jobs/:id', requireAuth, updateJob);
+app.delete('/jobs/:id', requireAuth, deleteJob);
 
 // Test Route
 app.get('/', (req, res) => {

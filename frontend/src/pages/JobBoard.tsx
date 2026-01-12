@@ -1,8 +1,12 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { JobsTable } from '@/components/jobs/JobsTable';
+import { JobForm } from '@/components/jobs/JobForm';
 
 export default function JobBoard() {
+    const [formOpen, setFormOpen] = useState(false);
+
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -11,14 +15,27 @@ export default function JobBoard() {
                     <h1 className="text-4xl font-bold text-black mb-2">Applications</h1>
                     <p className="text-gray-600">Manage and track your job applications</p>
                 </div>
-                <Button className="bg-black text-white hover:bg-gray-900 border-2 border-black rounded-lg px-6 py-2.5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <Button 
+                    onClick={() => setFormOpen(true)}
+                    className="bg-black text-white hover:bg-gray-900 border-2 border-black rounded-lg px-6 py-2.5 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                >
                     <Plus className="mr-2 h-4 w-4" />
                     Add Application
                 </Button>
             </div>
 
             {/* Table */}
-            <JobsTable />
+            <JobsTable onJobAdded={() => setFormOpen(false)} />
+
+            {/* Job Form Modal */}
+            <JobForm 
+                open={formOpen} 
+                onOpenChange={setFormOpen}
+                onSuccess={() => {
+                    setFormOpen(false);
+                    // JobsTable will refresh via socket or we can trigger a refetch
+                }}
+            />
         </div>
     );
 }
