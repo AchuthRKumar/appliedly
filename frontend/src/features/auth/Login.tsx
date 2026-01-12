@@ -25,7 +25,7 @@ export default function Login() {
                             <line x1="12" y1="22.08" x2="12" y2="12"></line>
                         </svg>
                     </div>
-                    <h1 className="text-4xl font-bold tracking-tight text-black mb-2">Job Tracker</h1>
+                    <h1 className="text-4xl font-bold tracking-tight text-black mb-2">Appliedly</h1>
                     <p className="text-sm text-gray-600">Manage your job applications</p>
                 </div>
 
