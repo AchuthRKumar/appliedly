@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import cookieSession from 'cookie-session';
-import { googleLogin, googleCallback } from './controllers/authController.js';
+import { googleLogin, googleCallback, getUserProfile } from './controllers/authController.js';
 import { handleGmailWebhook } from './controllers/webhookController.js';
 import { getJobs } from './controllers/jobController.js';
 import { requireAuth } from './middleware/requireAuth.js';
@@ -30,8 +30,8 @@ app.use(
 
 const allowedOrigins = [
   'http://localhost:5173', // For local frontend development
-  // frontend URL
-];
+  process.env.FRONTEND_URL, // Production frontend URL
+].filter(Boolean) as string[]; // Remove undefined values
 app.use(cors({
   origin: function (origin, callback) {
     // allow requests with no origin (like mobile apps or curl requests)
@@ -75,6 +75,7 @@ mongoose.connect(process.env.MONGO_URI as string)
 
 app.get('/auth/google', googleLogin);
 app.get('/auth/google/callback', googleCallback);
+app.get('/auth/me', requireAuth, getUserProfile); // New profile endpoint
 app.post('/webhook/gmail', handleGmailWebhook);
 app.get('/jobs', requireAuth, getJobs);
 

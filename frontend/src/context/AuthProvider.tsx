@@ -1,10 +1,12 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import api from '@/lib/api';
 
 interface User {
     _id: string;
     email?: string;
     name?: string;
+    avatar?: string;
 }
 
 interface AuthContextType {
@@ -23,33 +25,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         const checkAuth = async () => {
-            // 1. Check for uid in URL (redirect from login)
+            // If we have a uid in params, it means we just logged in.
+            // We can optimistically set it, but we should verify with backend.
             const uid = searchParams.get('uid');
             if (uid) {
-                setUser({ _id: uid });
                 // Clean URL
                 window.history.replaceState({}, '', '/');
-                setIsLoading(false);
-                return;
             }
 
-            // 2. Or check session via API (if we had a /me endpoint)
-            // For now, we'll assume if we have a socket/cookie we are good, 
-            // but without a /me endpoint we verify state by trying to fetch data or generic ping
             try {
-                // Placeholder: If we wanted to verify session, we'd hit backend.
-                // setUser({ _id: 'stored-id' }); // If we persisted it
-            } catch (e) {
-                // Not logged in
+                // Always try to fetch full profile to verify session is valid
+                const { data } = await api.get('/auth/me');
+                setUser(data);
+            } catch (error) {
+                // If 401, we are not logged in.
+                setUser(null);
+            } finally {
+                setIsLoading(false);
             }
-            setIsLoading(false);
         };
 
         checkAuth();
     }, [searchParams]);
 
     const login = () => {
-        window.location.href = 'https://appliedly.onrender.com/auth/google';
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        window.location.href = `${apiUrl}/auth/google`;
     };
 
     const logout = () => {

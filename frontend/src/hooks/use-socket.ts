@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
-const SOCKET_URL = 'https://appliedly.onrender.com'; // Match backend URL
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
 
 export const useSocket = (userId?: string) => {
     const [socket, setSocket] = useState<Socket | null>(null);

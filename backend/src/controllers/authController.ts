@@ -4,6 +4,29 @@ import { User } from '../models/User.js';
 import { decrypt, encrypt } from '../lib/security.js';
 import { watchGmail } from '../services/gmailService.js';
 
+export const getUserProfile = async (req: Request, res: Response) => {
+  try {
+    if (!req.session || !req.session.userId) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    const user = await User.findById(req.session.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      avatar: user.googleId ? `https://lh3.googleusercontent.com/a/${user.googleId}` : undefined // Approximation or fetch real one
+    });
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
@@ -83,9 +106,9 @@ export const googleCallback = async (req: Request, res: Response) => {
     }
 
     (req.session as any).userId = user._id;
-    // Redirect to Frontend (Hardcoded for now)
-    // In prod, use a JWT to log them into your app
-    res.redirect(`http://localhost:5173/dashboard?uid=${user._id}`);
+    // Redirect to Frontend
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    res.redirect(`${frontendUrl}/dashboard?uid=${user._id}`);
 
   } catch (error) {
     console.error('Auth Error:', error);

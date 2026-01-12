@@ -3,19 +3,16 @@ import { LayoutDashboard, Briefcase, Settings, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useAuth } from '@/context/AuthProvider';
 
 interface SidebarProps {
     className?: string;
 }
 
 export function Sidebar({ className }: SidebarProps) {
+    const { user, logout } = useAuth();
     const handleLogout = () => {
-        // Clear cookies/tokens logic here or redirect to backend logout
-        // For now, since backend handles cookies, we might need a logout endpoint?
-        // Using simple clear and reload for demo if endpoint missing
-        console.log('Logging out...');
-        // TODO: Implement logout API call
-        window.location.href = '/login';
+        logout();
     };
 
     const links = [
@@ -59,12 +56,12 @@ export function Sidebar({ className }: SidebarProps) {
             <div className="absolute bottom-4 left-0 w-full px-4">
                 <div className="flex items-center gap-3 p-2 rounded-lg bg-secondary/20 mb-3">
                     <Avatar className="h-9 w-9">
-                        <AvatarImage src="" />
-                        <AvatarFallback>U</AvatarFallback>
+                        <AvatarImage src={user?.avatar} />
+                        <AvatarFallback>{user?.name?.[0] || 'U'}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 overflow-hidden">
-                        <p className="text-sm font-medium leading-none truncate">User</p>
-                        <p className="text-xs text-muted-foreground truncate">user@example.com</p>
+                        <p className="text-sm font-medium leading-none truncate">{user?.name || 'User'}</p>
+                        <p className="text-xs text-muted-foreground truncate">{user?.email || 'No email'}</p>
                     </div>
                 </div>
                 <Button variant="ghost" className="w-full justify-start gap-2 text-red-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20" onClick={handleLogout}>
